@@ -4,13 +4,15 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from pydantic import constr
 
-from .models import Receipt, ReceiptsIdPointsGetResponse, ReceiptsProcessPostResponse
+from .controller import get_points, process_receipt
+from .models import (Receipt, ReceiptsIdPointsGetResponse,
+                     ReceiptsProcessPostResponse)
 
 app = FastAPI(
     title="Receipt Processor",
@@ -18,7 +20,10 @@ app = FastAPI(
     version="1.0.0",
 )
 
-favicon_path = 'app/favicon.png'
+store = {}
+
+favicon_path = "app/favicon.png"
+
 
 @app.get("/")
 def get_app_root():
@@ -39,7 +44,7 @@ def post_receipts_process(body: Receipt) -> Optional[ReceiptsProcessPostResponse
     """
     Submits a receipt for processing
     """
-    pass
+    return ReceiptsProcessPostResponse(id=process_receipt(store, body))
 
 
 @app.get(
@@ -53,4 +58,4 @@ def get_receipts_id_points(
     """
     Returns the points awarded for the receipt
     """
-    pass
+    return ReceiptsIdPointsGetResponse(points=get_points(store, id))
